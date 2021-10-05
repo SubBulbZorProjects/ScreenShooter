@@ -16,13 +16,13 @@ class MyMainWindow(QtWidgets.QMainWindow, Ui_MainWindow): # pylint: disable=(c-e
         super().__init__(*args, **kwargs)
 
         self.setupUi(self)
-
         self.disk_percent_limit = 95.00
         self.iteration = 0
         self.folder_name = ""
         self.threadpool = QtCore.QThreadPool()
         self.options = QtWidgets.QFileDialog.Options()
         self.local_path_icons = os.path.join(os.path.dirname(__file__),'frontend','images')
+        self.setWindowIcon(QtGui.QIcon(os.path.join(self.local_path_icons, 'ScreenIcon.ico')))
         self.flag = False
         self.config_dict = {}
         self.config = Config()
@@ -72,7 +72,7 @@ class MyMainWindow(QtWidgets.QMainWindow, Ui_MainWindow): # pylint: disable=(c-e
         self.startButton.setCheckable(True)
         self.counterLine.setText("_ images")
         self.msg.setWindowTitle("Warning")
-        self.tray_icon =  QtWidgets.QSystemTrayIcon(QtGui.QIcon(os.path.join(self.local_path_icons,'small_logo.png')))
+        self.tray_icon =  QtWidgets.QSystemTrayIcon(QtGui.QIcon(os.path.join(self.local_path_icons,'ScreenIcon.ico')))
 
     def __set_icons_settings(self) -> None:
         """Settings for icons"""

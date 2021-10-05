@@ -489,7 +489,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "ScreenShooter"))
         self.startButton.setText(_translate("MainWindow", "Start"))
         self.pathButton.setText(_translate("MainWindow", "Open"))
         self.browseLabel_3.setText(_translate("MainWindow", "Browse folder"))
