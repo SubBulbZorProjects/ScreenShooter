@@ -2,11 +2,13 @@
 
 import sys
 import os
+import configparser
 from PyQt5 import QtCore, QtGui, QtWidgets
 from frontend.screenshootergui import Ui_MainWindow
 from backend.configurator import Config
 from backend.jobrunner import JobRunner
 from backend.disk_usage import main as disk_usage
+from backend.configurator import State
 
 class MyMainWindow(QtWidgets.QMainWindow, Ui_MainWindow): # pylint: disable=(c-extension-no-member)
     ''' Initialize Gui '''
@@ -30,31 +32,44 @@ class MyMainWindow(QtWidgets.QMainWindow, Ui_MainWindow): # pylint: disable=(c-e
         self.__set_interval_settings()
         self.__set_icons_settings()
         self.read_config()
-
-
-        show_action = QtWidgets.QAction("Show", self)
-        quit_action = QtWidgets.QAction("Exit", self)
-        show_action.triggered.connect(self.show)
-        quit_action.triggered.connect(self.close)
-        tray_menu = QtWidgets.QMenu()
-        tray_menu.addAction(show_action)
-        tray_menu.addAction(quit_action)
-        self.tray_icon.setContextMenu(tray_menu)
-        self.tray_icon.show()
-        self.tray_icon.activated.connect(self.show)
-
+        self.__set_tray_menu()
         self.closeAppBtn.clicked.connect(lambda: self.close())
         self.minimizeAppBtn.clicked.connect(lambda: self.hide())
         self.pathButton.clicked.connect(self.get_folder_path)
-        self.startButton.setCheckable(True)
         self.startButton.clicked.connect(self.start_shooter)
         self.qualitySlider.valueChanged.connect(self.update_quality_line)
         self.qualityEditLine.textChanged.connect(self.update_slider)
         self.browseLabel_3.mousePressEvent = self.open_folder
 
-    ## METHODS ## 
+        self.__press_pos = None
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton and event.pos():
+            self.__press_pos = event.pos()  # remember starting position
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.__press_pos = None
+
+    def mouseMoveEvent(self, event):
+        if self.__press_pos :  # follow the mouse
+            self.move(self.pos() + (event.pos() - self.__press_pos))
+
+    ## METHODS ##
+    def __set_tray_menu(self) -> None:
+        hide_action = QtWidgets.QAction("Hide", self)
+        quit_action = QtWidgets.QAction("Exit", self)
+        hide_action.triggered.connect(self.hide)
+        quit_action.triggered.connect(self.close)
+        tray_menu = QtWidgets.QMenu()
+        tray_menu.addAction(hide_action)
+        tray_menu.addAction(quit_action)
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
+        self.tray_icon.activated.connect(self.show)
+
     def __set_attributes(self) -> None:
         """Set program attributes"""
+        self.startButton.setCheckable(True)
         self.counterLine.setText("_ images")
         self.msg.setWindowTitle("Warning")
         self.tray_icon =  QtWidgets.QSystemTrayIcon(QtGui.QIcon(os.path.join(self.local_path_icons,'small_logo.png')))
@@ -97,11 +112,10 @@ class MyMainWindow(QtWidgets.QMainWindow, Ui_MainWindow): # pylint: disable=(c-e
         """Read config / If config not exist make custom"""
         try:
             self.config_dict = self.config.read_config()
-            print(self.config_dict)
-        except Exception as error:
+        except configparser.NoOptionError as error:
             print("read_config", error)
-
-        if self.config_dict:
+            
+        if self.config_dict != State.CONFIG_ERROR:
             try:
                 self.intervalEditLine.setText(self.config_dict['interval'])
                 self.qualityEditLine.setText(self.config_dict['quality'])
