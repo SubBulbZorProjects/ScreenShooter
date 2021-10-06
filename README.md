@@ -1,6 +1,6 @@
 # Screenshoter
 
-![SS](https://cdn.imageupload.workers.dev/MbP0Ddyf_2021-10-06%2010_41_46-Window.png)
+![SS](https://i.ibb.co/cTVGjLx/2021-10-06-10-41-46-Window.png)
 
 Screenshoter tool is a simple desktop application that automate screenshot process.
 
